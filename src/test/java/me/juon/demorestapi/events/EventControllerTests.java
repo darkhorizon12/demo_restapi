@@ -1,14 +1,13 @@
 package me.juon.demorestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.juon.demorestapi.common.TestDescription;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,6 +34,7 @@ public class EventControllerTests {
     ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("정상적으로 이벤트를 생성하는 테스트")
     void createEvent() throws Exception {
         EventDto event = EventDto.builder()
                 .name("spring")
@@ -107,6 +107,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @TestDescription("잘못된 입력값이 들어왔을 때 BadRequest 결과")
     void 나쁜요청_잘못된_입력값() throws Exception {
         EventDto event = EventDto.builder()
                 .name("spring")
@@ -114,7 +115,7 @@ public class EventControllerTests {
                 .beginEnrollmentDateTime(LocalDateTime.of(2023, 4, 12, 13, 22))
                 .closeEnrollmentDateTime(LocalDateTime.of(2023, 4, 8, 14, 00))
                 .beginEventDateTime(LocalDateTime.of(2023, 4, 28, 00, 0))
-                .endEventDateTime(LocalDateTime.of(2023, 4, 30, 0, 0))
+                .endEventDateTime(LocalDateTime.of(2023, 4, 10, 0, 0))
                 .basePrice(10_000)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
@@ -126,7 +127,13 @@ public class EventControllerTests {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(event))
                 )
+                .andDo(print())
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+//                .andExpect(jsonPath("$[0].field").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+//                .andExpect(jsonPath("$[0].rejectedValue").exists())
         ;
 
     }
