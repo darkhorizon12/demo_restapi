@@ -95,7 +95,7 @@ public class EventControllerTests {
     }
 
     @Test
-    void 나쁜요청_빈입력값() throws Exception {
+    void 나쁜요청_빈_입력값() throws Exception {
         EventDto eventDto = EventDto.builder().build();
 
         mockMvc.perform(post("/api/events")
@@ -103,6 +103,31 @@ public class EventControllerTests {
                         .content(objectMapper.writeValueAsString(eventDto))
                 )
                 .andExpect(status().isBadRequest())
-                ;
+        ;
+    }
+
+    @Test
+    void 나쁜요청_잘못된_입력값() throws Exception {
+        EventDto event = EventDto.builder()
+                .name("spring")
+                .description("Rest api developement")
+                .beginEnrollmentDateTime(LocalDateTime.of(2023, 4, 12, 13, 22))
+                .closeEnrollmentDateTime(LocalDateTime.of(2023, 4, 8, 14, 00))
+                .beginEventDateTime(LocalDateTime.of(2023, 4, 28, 00, 0))
+                .endEventDateTime(LocalDateTime.of(2023, 4, 30, 0, 0))
+                .basePrice(10_000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 2번")
+                .build();
+//        Mockito.when(eventRepository.save(event)).thenReturn(event);    // 목빈의 해당 메서드 이벤트가 발생할 때, 임의의 객체 리턴
+
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(event))
+                )
+                .andExpect(status().isBadRequest())
+        ;
+
     }
 }
