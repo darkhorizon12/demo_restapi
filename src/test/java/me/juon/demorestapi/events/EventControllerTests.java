@@ -65,7 +65,7 @@ public class EventControllerTests {
     }
 
     @Test
-    void createEvent_나쁜응답() throws Exception {
+    void createEvent_나쁜요청() throws Exception {
         Event event = Event.builder()
                 .id(100)
                 .name("spring")
@@ -87,9 +87,22 @@ public class EventControllerTests {
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaTypes.HAL_JSON)
-                        .content(objectMapper.writeValueAsString(event)))
+                        .content(objectMapper.writeValueAsString(event))
+                )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
+    }
+
+    @Test
+    void 나쁜요청_빈입력값() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(eventDto))
+                )
+                .andExpect(status().isBadRequest())
+                ;
     }
 }
