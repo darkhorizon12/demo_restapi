@@ -2,6 +2,7 @@ package me.juon.demorestapi.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 
@@ -30,4 +31,9 @@ public class Event {
     private boolean free;
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
+
+    public void update() {
+        this.free = (this.basePrice == 0 && this.maxPrice == 0) ? true : false;
+        this.offline = ObjectUtils.isEmpty(this.location) ? false : true;
+    }
 }
